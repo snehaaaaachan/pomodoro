@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="Scrolling_Website_To_Imagination.css">
+  <script defer src="Scrolling_Website_To_Imagination.js"></script>
+  <title>Ketchup with Time</title>
+  <style>
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Comic Sans MS";
+    font-weight: bold;
+    overflow-x: hidden;
+    color: white;
+    position: relative;
+    background-color: #1e1e2f; /* No gradient */
+    /* Removed background-image and transition */
+  }
+  .wrapper, .content {
+    position: relative;
+    width: 100%;
+    z-index: -1;
+    height: 100vh;
+  }
+  .clocks {
+    width: 100%;
+    z-index: 3;
+    margin-top: 0; /* removed -50vh */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .clocks.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .heros, .content {
+    width: 100%;
+    height: 100vh;
+  }
+  .image-container {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    perspective: 500px;
+    overflow: hidden;
+  }
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+  .video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    opacity: 1; /* always visible */
+    /* removed opacity transition */
+  }
+  .video-overlay video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* rest unchanged... */
+
+
+    .video-overlay.visible {
+      opacity: 1;
+    }
+    .pomodoro-section {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 10;
+      opacity:0;
+      transition:opacity 0.5s;
+    }
+    .pomodoro-section.active {
+      display: flex;
+      opacity: 1;
+    }
+    .pomodoro-section h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
+    }
+   
+    .pomodoro-buttons button {
+      font-family: "Comic Sans MS";
+      padding: 8px 14px ;
+      font-size: 1.2rem;
+      margin: 0.5rem;
+      cursor: pointer;
+      border-radius: 30px 10px 30px 10px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
+    }
+    .pomodoro-buttons button:hover {
+      background-color: rgba(6, 5, 5, 0.256);
+      transform: scale(1.05);
+    }
+    #notes-window {
+      background: rgba(0,0,0,0.6);
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 10px;
+      color: yellow;
+    }
+    #notes-area {
+      background: transparent;
+      color: white;
+      border: none;
+      width: 100%;
+      height: 100px;
+      resize: none;
+
+    }
+
+    .blocks {
+  display: flex;
+  margin-top: 3rem;
+  padding: 0.5rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.735);
+  backdrop-filter: blur(8px);
+  gap: 0.7rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 4;
+}
+.block {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 0 5px rgba(0,0,0,0.4);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.block:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 15px rgba(255,255,255,0.8);
+}
+
+#timer {
+    font-size: 4rem; /* Smaller size */
+    font-family: 'Comic Sans MS', cursive;
+    text-align: center;
+    padding: 15px;
+    border: 3px solid #fff;
+    border-radius: 30px;
+    width: fit-content;
+    margin: 30px auto;
+    background-color: rgba(244, 239, 239, 0.393);
+    color: white;
+    outline: none;
+  }
+
+  .mode-buttons {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .mode-buttons button {
+    font-family: 'Comic Sans MS', cursive;
+    padding: 8px 14px;
+    margin: 0 5px;
+    border: 2px solid #fff;
+    border-radius: 50px;
+    background-color: #f6f2f263;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mode-buttons button.active {
+    background-color: #f9f7f75d;
+  }
+
+  .mode-buttons button:hover {
+    background-color: #2222227e;
+  }
+
+  #spotify-controls {
+  position: fixed;
+  bottom: 110px;
+  left: 20px;
+  z-index: 100;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+#spotify-controls input {
+  width: 200px;
+  padding: 6px 10px;
+  border: 1px solid #e2e1e1;
+  border-radius: 6px;
+  background-color: #1e1e1e65;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+#spotify-controls input::placeholder {
+  color: #aaaaaaf7;
+}
+
+#spotify-controls button {
+  padding: 6px 6px;
+  border: none;
+  border-radius: 50px;
+  background-color: #3d3d3d4f;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+#spotify-controls button:hover {
+  background-color: #a5a2a232;
+}
+
+#spotify-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  width: 300px;
+  height: 80px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.132);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#notes-fab {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid white;
+  font-size: 22px;
+  color: white;
+  cursor: pointer;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+#notes-fab:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* Sticky Notes Window - Better Contrast */
+#notes-window {
+  position: fixed;
+  right: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 240px;
+  height: 190px;
+  background: rgba(30, 30, 30, 0.6);
+  border: 2px solid white;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  padding: 0.6rem;
+  display: none;
+  flex-direction: column;
+  z-index: 99;
+  color: rgb(226, 219, 21);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  
+}
+
+/* Header - Clearer Font */
+#notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
+
+/* Close Button */
+#close-notes {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Notes Text Area */
+#notes-area {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: #ffffff;
+  font-family: "Courier New", monospace ;
+  font-size: 0.95rem;
+  border: none;
+  outline: none;
+  resize: none;
+  line-height: 1.4;
+  text-shadow: 0 0 3px rgba(14, 14, 14, 0.897);
+}
+   
+@keyframes subtle-wiggle {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(0.5deg) scale(1.005, 0.995);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    transform: rotate(-0.5deg) scale(0.995, 1.005);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes subtle-wiggle {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.01, 0.99) rotate(-0.3deg);
+  }
+  50% {
+    transform: scale(0.99, 1.01) rotate(0.3deg);
+  }
+  75% {
+    transform: scale(1.01, 0.99) rotate(-0.2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+
+#timer {
+  animation: subtle-wiggle 2s infinite ease-in-out;
+  transform-origin: center;
+  display: inline-block; /* Important if it's a block element */
+}
+
+#creditsBtn {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  font-family: 'Comic Sans MS', cursive;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+#creditsPopup {
+  position: fixed;
+  bottom: 4.5rem;
+  right: 1rem;
+  width: 250px;
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-family: 'Comic Sans MS', cursive;
+  display: none;
+  z-index: 999;
+}
+
+
+
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="content">
+      <section class="heros" id="triggerScene"></section>
+    </div>
+    <div class="clocks">
+      <a href="#down" id="tap"></a>
+    </div>
+    <div class="image-container">
+      <img src="373ab8de-5c56-497f-ab57-110dc1fa2f6a.png" alt="image">
+    </div>
+  </div>
+
+  <div class="video-overlay visible" id="videoOverlay">
+    <video src="Untitled video - Made with Clipchamp.mp4" autoplay muted loop></video>
+  </div>
+
+  <section class="pomodoro-section " id="pomodoroSection">
+    <h1>Ketchup with Time</h1>
+    <div class="mode-buttons">
+  <button id="pomodoro-btn" class="active">Pomodoro</button>
+  <button id="shortbreak-btn">Short break</button>
+  <button id="longbreak-btn">Long break</button>
+</div>
+    <div id="timer" contenteditable="true">00:30:00</div>
+    <div class="pomodoro-buttons">
+      <button onclick="startTimer()">Start</button>
+      <button onclick="pauseTimer()">Pause</button>
+      <button onclick="resetTimer()">Reset</button>
+    </div>
+    <button id="notes-fab">📒</button>
+    <div id="notes-window" style="display:none;">
+      <div id="notes-header">
+        <span>NOTES</span>
+        <button id="close-notes">✖</button>
+      </div>
+      <textarea id="notes-area" placeholder="Jot something down..."></textarea>
+    </div>
+    
+    <nav class="blocks">
+      <div class="block gif-1" title="GIF Background 1"></div>
+      <div class="block gif-2" title="GIF Background 2"></div>
+      <div class="block gif-3" title="GIF Background 3"></div>
+      <div class="block gif-4" title="GIF Background 4"></div>
+    </nav>
+    <div id="spotify-controls">
+      <input type="text" id="spotify-url" placeholder="Paste Spotify playlist URL">
+      <button onclick="changeSpotify()">Change</button>
+    </div>
+    <div id="spotify-container">
+      <iframe id="spotify-player" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXbcPC6Vvqudd?si=a165c179811b46a7_source=generator" width="300" height="80" frameborder="0" allowtransparency="true" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    
+
+    <button id="creditsBtn">🎬 Credits</button>
+<div id="creditsPopup">
+  <p>
+    GIFs from Studio Ghibli (via Pinterest & Giphy).<br>
+    Video from <em>Your Name</em> by Makoto Shinkai (via Pinterest).<br>
+    All rights belong to their respective creators. 
+  </p>
+</div>
+
+
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    
+  const btn = document.getElementById("creditsBtn");
+  const popup = document.getElementById("creditsPopup");
+
+  btn.addEventListener("click", () => {
+    popup.style.display = popup.style.display === "none" ? "block" : "none";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!btn.contains(e.target) && !popup.contains(e.target)) {
+      popup.style.display = "none";
+    }
+  });
+
+
+    gsap.registerPlugin(ScrollTrigger);
+
+   gsap.registerPlugin(ScrollTrigger);
+
+let pomodoroTrigger;
+let backgroundLocked = false;
+let hovering = false;
+
+const gifBackgrounds = [
+  "calcifer.gif",
+  "50077.gif",
+  "rainhack1.gif",
+  "snowfall.gif"
+];
+
+const blocks = document.querySelectorAll('.block');
+const videoOverlay = document.getElementById('videoOverlay');
+
+function setVideoBackground(src) {
+  if (src.endsWith('.gif')) {
+    videoOverlay.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;">`;
+  } else {
+    videoOverlay.innerHTML = `<video src="${src}" autoplay muted loop style="width:100%; height:100%; object-fit:cover;"></video>`;
+  }
+}
+
+// Set up hover and click for GIF blocks
+blocks.forEach((block, i) => {
+  const gif = gifBackgrounds[i];
+  block.style.backgroundImage = `url(${gif})`;
+
+  block.addEventListener('mouseenter', () => {
+    if (!backgroundLocked) {
+      hovering = true;
+      setVideoBackground(gif);
+    }
+  });
+
+  block.addEventListener('mouseleave', () => {
+    hovering = false;
+    if (!backgroundLocked) {
+      setVideoBackground("Untitled video - Made with Clipchamp.mp4"); // revert to default
+    }
+  });
+
+  block.addEventListener('click', () => {
+    backgroundLocked = true;
+    setVideoBackground(gif);
+    disableScrollTriggers(); // 🚨 This disables the ScrollTrigger
+  });
+});
+
+// Create one ScrollTrigger that is controlled by backgroundLocked
+function createScrollTrigger() {
+  pomodoroTrigger = ScrollTrigger.create({
+    trigger: ".image-container",
+    start: "bottom top",
+  
+    onEnter: () => {
+      if (!backgroundLocked) {
+        document.getElementById("pomodoroSection").classList.add("active");
+      }
+    },
+    onLeaveBack: () => {
+      if (!backgroundLocked) {
+        document.getElementById("pomodoroSection").classList.remove("active");
+      }
+    }
+  });
+}
+
+function disableScrollTriggers() {
+  if (pomodoroTrigger) {
+    pomodoroTrigger.kill(); // ❌ Kill it when background is locked
+  }
+}
+
+// 🚀 Call once on page load
+createScrollTrigger();
+
+  
+   let timerInterval;
+let isRunning = false;
+let timeLeft = 30 * 60;
+let timeLeftAtModeStart = 30 * 60;
+let currentMode = 'pomodoro';
+
+
+const timerEl = document.getElementById('timer');
+const pomodoroBtn = document.getElementById('pomodoro-btn');
+const shortBreakBtn = document.getElementById('shortbreak-btn');
+const longBreakBtn = document.getElementById('longbreak-btn');
+
+// Format seconds to HH:MM:SS
+function formatTime(seconds) {
+  if (seconds < 0) seconds = 0;
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return [h, m, s].map(unit => unit.toString().padStart(2, '0')).join(':');
+}
+
+// Parse HH:MM:SS into total seconds
+function parseTimeInput(str) {
+  str = str.trim();
+  const parts = str.split(':');
+  while (parts.length < 3) parts.unshift('0');
+  const [hStr, mStr, sStr] = parts;
+  if (!/^\d+$/.test(hStr) || !/^\d+$/.test(mStr) || !/^\d+$/.test(sStr)) return null;
+
+  const h = parseInt(hStr, 10);
+  const m = parseInt(mStr, 10);
+  const s = parseInt(sStr, 10);
+
+  if (m >= 60 || s >= 60) return null;
+
+  return h * 3600 + m * 60 + s;
+}
+
+// Update the display
+function updateDisplay() {
+  timerEl.textContent = formatTime(timeLeft);
+}
+
+// Timer controls
+function startTimer() {
+  if (isRunning) return;
+  isRunning = true;
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateDisplay();
+    } else {
+      clearInterval(timerInterval);
+      isRunning = false;
+      alert('Time is up!');
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timerInterval);
+  isRunning = false;
+}
+
+function resetTimer() {
+  pauseTimer();
+  timeLeft = timeLeftAtModeStart;
+  updateDisplay();
+}
+
+// Mode switching
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-buttons button').forEach(btn => btn.classList.remove('active'));
+  if (mode === 'pomodoro') {
+    timeLeft = 30 * 60;
+    timeLeftAtModeStart = timeLeft;
+    pomodoroBtn.classList.add('active');
+  } else if (mode === 'shortbreak') {
+    timeLeft = 5 * 60;
+    timeLeftAtModeStart = timeLeft;
+    shortBreakBtn.classList.add('active');
+  } else if (mode === 'longbreak') {
+    timeLeft = 15 * 60;
+    timeLeftAtModeStart = timeLeft;
+    longBreakBtn.classList.add('active');
+  }
+  updateDisplay();
+  pauseTimer();
+}
+
+pomodoroBtn.addEventListener('click', () => setMode('pomodoro'));
+shortBreakBtn.addEventListener('click', () => setMode('shortbreak'));
+longBreakBtn.addEventListener('click', () => setMode('longbreak'));
+
+// Allow manual input (on blur or enter)
+timerEl.addEventListener('blur', () => {
+  const newTime = parseTimeInput(timerEl.textContent);
+  if (newTime !== null) {
+    timeLeft = newTime;
+    timeLeftAtModeStart = newTime;
+    updateDisplay();
+  } else {
+    updateDisplay(); // revert if invalid
+  }
+});
+
+timerEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    timerEl.blur();
+  }
+});
+
+// Initialize
+updateDisplay();
+
+
+
+       
+  
+
+
+   
+    
+    
+
+    document.getElementById('notes-fab').addEventListener('click', () => {
+      const notesWindow = document.getElementById('notes-window');
+      notesWindow.style.display = notesWindow.style.display === 'none' ? 'block' : 'none';
+    });
+    document.getElementById('close-notes').addEventListener('click', () => {
+      document.getElementById('notes-window').style.display = 'none';
+    });
+    document.getElementById('notes-area').value = localStorage.getItem('ketchup-notes') || "";
+    document.getElementById('notes-area').addEventListener('input', () => {
+      localStorage.setItem('ketchup-notes', document.getElementById('notes-area').value);
+    });
+    function changeSpotify() {
+      const url = document.getElementById('spotify-url').value.trim();
+      if (!url.includes("open.spotify.com/playlist/")) {
+        alert("Please paste a valid Spotify playlist URL.");
+        return;
+      }
+      const embedUrl = url.replace("open.spotify.com/playlist", "open.spotify.com/embed/playlist").split("?")[0];
+      document.getElementById('spotify-player').src = embedUrl + "?utm_source=generator";
+    }
+  </script>
+</body>
+</html>
